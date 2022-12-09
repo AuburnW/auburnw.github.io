@@ -1,0 +1,19 @@
+body {
+	background-color: #000;
+	color: #FFF;
+	font-family: Arial, sans-serif;
+}
+
+.post .date {
+	font-style: italic;
+	font-size: 0.8em;
+}
+
+.post h2 {
+	margin-bottom: 3px;
+}
+
+.post p {
+	margin-top: 10px;
+	margin-bottom: 0px;
+}

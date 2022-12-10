@@ -1,7 +1,7 @@
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 baseurl: "" # the subpath of your site, e.g. /blog
 title: AuburnW.net
-permalink: /:year-:month-:day/:title/
+permalink: /:year/:month-:day-:title/
 defaults:
   -
     scope:
@@ -17,3 +17,4 @@ titles_from_headings:
   enabled:  true
   strip_title: true
   collections: true
+

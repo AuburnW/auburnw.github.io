@@ -4,12 +4,28 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
+    <meta name="author" content="Auburn W.">
+    {% if page.excerpt %}
+      <meta name="description" content="{{ page.excerpt | strip_html }}">
+    {% endif %}
     <title>{{ page.title }} - {{ site.title }}</title>
     <link rel="stylesheet" href="{{ "style.css" | relative_url }}">
   </head>
 
   <body>
-    {{ content }}
+    <div class="banner">Auburn W.</div>
+    <nav>
+      <a href="{{ "/" | relative_url }}">Posts</a>
+      <a href="#">Test 1</a>
+      <a href="#">Test 2</a>
+    </nav>
+    <article class="main">
+      <h1>{{ page.title }}</h1>
+      {% if page.date %}
+        {% include date.liquid date=page.date updated=page.updated %}
+      {% endif %}
+      {{ content }}
+    </article>
   </body>
 
 </html>

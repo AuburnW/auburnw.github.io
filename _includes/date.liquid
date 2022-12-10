@@ -1,0 +1,11 @@
+<div class="date">
+  <time datetime="{{ include.date | date: "%Y-%m-%d" }}">
+    {{ include.date | date: "%B %-d, %Y" }}
+  </time>
+  {% if include.updated %}
+    — updated
+    <time datetime="{{ include.updated | date: "%Y-%m-%d" }}">
+      {{ include.updated | date: "%B %-d, %Y" }}
+    </time>
+  {% endif %}
+</div>

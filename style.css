@@ -1,10 +1,55 @@
 body {
-	background-color: #000;
-	color: #FFF;
+	background-color: #000000;
+	color: #f8ebde;
 	font-family: Arial, sans-serif;
 }
 
-.post .date {
+h1 {
+	font-size: 2em;
+	font-family: Tahoma, sans-serif;
+	padding-bottom: 5px;
+	border-bottom: 5px #e66510 solid;
+	border-radius: 5px;
+	margin-bottom: 5px;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: #ffb452
+}
+
+h2 {
+	font-size: 1.4em;
+}
+
+h3 {
+	font-size: 1.3em;
+}
+
+h4 {
+	font-size: 1.2em;
+}
+
+h5 {
+	font-size: 1.15em;
+}
+
+h6 {
+	font-size: 1.1em;
+}
+
+a {
+	color: #71baff;
+}
+
+a:visited {
+	color: #e3ceff;
+}
+
+.date {
 	font-style: italic;
 	font-size: 0.8em;
 }
@@ -16,4 +61,34 @@ body {
 .post p {
 	margin-top: 10px;
 	margin-bottom: 0px;
+}
+
+.banner {
+	font-size: 1.8em;
+	text-align: center;
+	color: #f5cc81;
+}
+
+nav {
+	text-align: center;
+	margin-top: 10px;
+}
+
+nav a {
+	margin-left: 8px;
+	margin-right: 8px;
+	font-size: 1.2em;
+	color: #c5beb7;
+	display: inline-block;
+}
+
+nav a:visited {
+	color: #c5beb7;
+}
+
+.main>* {
+	max-width: 700px;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
 }

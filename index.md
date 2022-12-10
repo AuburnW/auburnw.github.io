@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Auburn W."
+title: "Posts"
 ---
 
 {% for post in site.posts %}

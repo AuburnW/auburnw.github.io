@@ -2,6 +2,7 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 baseurl: "" # the subpath of your site, e.g. /blog
 title: AuburnW.net
 permalink: /:year/:month-:day-:title/
+assets: https://assets.auburnw.net/
 defaults:
   -
     scope:

@@ -9,5 +9,4 @@ Here's the earliest surviving file I have from my youth:
 <img
 	src="{{ site.assets| append: "2005/12-20-ideis-for-videogames/image.png" }}"
 	width="892"
-	height="541"
->
+	height="541">

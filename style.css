@@ -86,7 +86,8 @@ nav a:visited {
 	color: #c5beb7;
 }
 
-.main>* {
+.main>*,
+body>p {
 	max-width: 700px;
 	display: block;
 	margin-left: auto;

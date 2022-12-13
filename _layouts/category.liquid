@@ -1,0 +1,6 @@
+---
+layout: default
+---
+{{ content }}
+{% assign category-posts = site.posts | where_exp: "post", "post.categories contains page.title" %}
+{% include posts.liquid posts=category-posts %}

@@ -1,0 +1,7 @@
+---
+layout: default
+---
+{% if page.date %}
+  {% include date.liquid date=page.date updated=page.updated %}
+{% endif %}
+{{ content }}

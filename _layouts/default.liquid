@@ -32,7 +32,7 @@
       <h1>{{ page.title }}</h1>
       {{ content }}
     </article>
-    {% if page.categories.size > 0 %}
+    {% if page.post and page.categories.size > 0 %}
       <p>
         {% assign category-collection = site.collections | where: "label", "categories" | first %}
         Categories:
@@ -46,6 +46,17 @@
         {% endfor %}
       </p>
     {% endif %}
+    {% if page.post and page.next or page.previous %}
+      <p>
+        {% if page.next %}
+          <a href="{{ page.next.url }}">« {{ page.next.title }}</a>
+          {% if page.previous %} | {% endif %}
+        {% endif %}
+        {% if page.previous %}
+          <a href="{{ page.previous.url }}">{{ page.previous.title }} »</a>
+        {% endif %}
+        </p>
+      {% endif %}
+    </body>
   </body>
-
 </html>

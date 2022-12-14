@@ -2,6 +2,7 @@ body {
 	background-color: #000000;
 	color: #f8ebde;
 	font-family: Arial, sans-serif;
+	overflow-wrap: break-word;
 }
 
 h1 {

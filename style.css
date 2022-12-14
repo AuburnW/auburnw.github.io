@@ -105,6 +105,18 @@ body>p {
 	margin: 10px auto;
 }
 
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: auto;
+}
+
+.pixelated {
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+}
+
 .audio>audio {
 	display: block;
 	margin-top: 5px;

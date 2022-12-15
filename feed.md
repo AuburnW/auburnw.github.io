@@ -1,4 +1,4 @@
 ---
 layout: "rss"
-permalink: /feed.xml
+permalink: /feed.rss
 ---

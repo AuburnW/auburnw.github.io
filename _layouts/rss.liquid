@@ -10,7 +10,7 @@
 			<link>{{ post.url | absolute_url }}</link>
 			<description>{{ post.excerpt | strip_html }}</description>
 			<pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
-			<guid>{{ post.date | date: "%F" }}-{{ post.slug }}</guid>
+			<guid isPermaLink="false">{{ post.date | date: "%F" }}-{{ post.slug }}</guid>
 			{% for category in post.categories %}
 				<category>{{ category }}</category>
 			{% endfor %}

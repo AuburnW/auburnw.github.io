@@ -9,7 +9,7 @@ h1 {
 	font-size: 2em;
 	font-family: Tahoma, sans-serif;
 	padding-bottom: 5px;
-	border-bottom: 5px #e66510 solid;
+	border-bottom: 5px #d34800 solid;
 	border-radius: 5px;
 	margin-bottom: 5px;
 }
@@ -67,7 +67,7 @@ a:visited {
 .banner {
 	font-size: 1.8em;
 	text-align: center;
-	color: #f5cc81;
+	color: #ff8e00;
 }
 
 nav {
@@ -127,4 +127,12 @@ img {
 
 video {
 	height: auto;
+}
+
+.icon {
+	width: 1.4em;
+	max-width: 100%;
+	height: auto;
+	display: inline;
+	vertical-align: -27%;
 }

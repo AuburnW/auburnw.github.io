@@ -11,10 +11,15 @@
     {% endif %}
     <title>{{ page.title }} - {{ site.title }}</title>
     <link rel="stylesheet" href="{{ "style.css" | relative_url }}">
+    <link rel="icon" href="{{ "icon.svg" | relative_url }}" type="image/svg"/>
+    <link rel="icon" href="{{ "icon.png" | relative_url }}" type="image/png" sizes="512x512"/>
   </head>
 
   <body>
-    <div class="banner">Auburn W.</div>
+    <div class="banner">
+      <img class="icon" src="{{ "icon.svg" | relative_url }}" width="16" height="16">
+      Auburn W.
+    </div>
     <nav>
       <a href="{{ "/" | relative_url }}">
         All Posts

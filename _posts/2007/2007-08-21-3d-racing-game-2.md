@@ -1,5 +1,5 @@
 ---
-category: Coding Games
+categories: Coding Games
 updated: 2022-12-14
 ---
 

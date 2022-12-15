@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Auburn W.</title>
+	<link>{{ "/" | absolute_url }}</link>
+	<description>Auburn's blog of coding, music, games, and more.</description>
+	{% for post in site.posts %}
+		<item>
+			<title>{{ post.title }}</title>
+			<link>{{ post.url | absolute_url }}</link>
+			<description>{{ post.excerpt | strip_html }}</description>
+			<pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
+			<guid>{{ post.date | date: "%F" }}-{{ post.slug }}</guid>
+			{% for category in post.categories %}
+				<category>{{ category }}</category>
+			{% endfor %}
+		</item>
+	{% endfor %}
+  </channel>
+</rss>

@@ -10,14 +10,29 @@
     {% endif %}
     <title>{{ page.title }} - {{ site.title }}</title>
     <link rel="stylesheet" href="{{ "style.css" | relative_url }}">
-    <link rel="icon" href="{{ "icon.svg" | relative_url }}" type="image/svg"/>
-    <link rel="icon" href="{{ "icon.png" | relative_url }}" type="image/png" sizes="512x512"/>
-    <link rel="alternate" href="{{ "feed.rss" | relative_url }}" type="application/rss+xml" title="Auburn W. blog feed">
+    <link
+      rel="icon"
+      href="{{ "icon.svg" | relative_url }}"
+      type="image/svg" />
+    <link
+      rel="icon"
+      href="{{ "icon.png" | relative_url }}"
+      type="image/png"
+      sizes="512x512" />
+    <link
+      rel="alternate"
+      href="{{ "feed.rss" | relative_url }}"
+      type="application/rss+xml"
+      title="Auburn W. blog feed">
   </head>
 
   <body>
     <div class="banner">
-      <img class="icon" src="{{ "icon.svg" | relative_url }}" width="16" height="16">
+      <img
+        class="icon"
+        src="{{ "icon.svg" | relative_url }}"
+        width="16"
+        height="16">
       Auburn W.
     </div>
     <nav>
@@ -56,13 +71,14 @@
       <p>
         {% if page.next %}
           <a href="{{ page.next.url }}">« {{ page.next.title }}</a>
-          {% if page.previous %} | {% endif %}
+          {% if page.previous %}
+            |
+          {% endif %}
         {% endif %}
         {% if page.previous %}
           <a href="{{ page.previous.url }}">{{ page.previous.title }} »</a>
         {% endif %}
-        </p>
-      {% endif %}
-    </body>
+      </p>
+    {% endif %}
   </body>
 </html>

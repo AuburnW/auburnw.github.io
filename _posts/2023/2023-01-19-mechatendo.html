@@ -1,0 +1,720 @@
+---
+categories: Coding
+title: The Mechatendo
+---
+
+<p>
+	After the apocalypse, how will you get your solitary interactive entertainment? With a
+	mechanical computer of course! As a bonus, it's also great at helping you practice mindfulness
+	(i.e. patience).
+</p>
+
+<p>
+	The machine I envision in my head implements a simplified version of
+	<a href="https://en.wikipedia.org/wiki/Brainfuck">Brainf***</a>. It's a 16-bit system in that
+	there's a whole 16 bits of memory. The program is encoded on a paper tape punched out with the
+	instructions. The tape can also have text and images printed on it, which are skipped over. As
+	for the user interface, there's a viewport that lets you see a portion of the tape. The machine
+	runs until it reaches a halt symbol, at which point the machine stops, the viewport showing the
+	output. It resumes when the user inputs a 1 or 0.
+</p>
+
+<p>
+	With a system like this, you can implement a very simple and slow RPG complete with
+	illustrations. Or I guess you could do some math. Rest assured though that this device is
+	designed to discourage productive use.
+</p>
+
+<h2>Semantics</h2>
+
+<p>
+	Memory is 16 bits and wraps around when rotated. Initial data is arbitrary. The program tape
+	can be as long as you want.
+</p>
+
+<p>
+	Symbols:<br>
+	<code>*</code> No-op<br>
+	<code>.</code> Halt. When resumed, the current bit is replaced with the user's input<br>
+	<code>&gt;</code> Rotate memory 1 bit to the right<br>
+	<code>&lt;</code> Rotate memory 1 bit to the left<br>
+	<code>0</code> Write 0 to the current bit<br>
+	<code>1</code> Write 1 to the current bit<br>
+
+	<code>[</code> If the current bit is 0, jump forward to the symbol after the matching
+	<code>]</code> symbol<br>
+
+	<code>]</code> If the current bit is 1, jump backward to the symbol after the matching
+	<code>[</code> symbol
+</p>
+
+<p>After executing a symbol, the program read head advances to the next symbol.</p>
+
+<p>
+	<code>[</code> and <code>]</code> nest. For example, the first <code>[</code> in the program
+	<code>[[]]</code> only matches with the last <code>]</code>. The maximum nest depth is 16 and
+	exceeding it is undefined behavior.
+</p>
+
+<p>Jumping when the current bit is uninitialized is undefined behavior.</p>
+
+<p>Reading past the beginning or end of the program is undefined behavior.</p>
+
+<p>In the simulator, undefined behavior shows an error and aborts the program.</p>
+
+<p>
+	The program tape viewport begins 20 symbols past the program read head and is 20 symbols long.
+</p>
+
+<p>
+	Note that in the physical machine, the user would typically start the program on the blank
+	portion of the tape before the actual program, running no-ops until the program is reached. Due
+	to this, a program should typically start with a halt to indicate to the user that it is ready
+	for input.
+</p>
+
+<h2>The Physical Thing</h2>
+
+<p>
+	While I utterly lack the handy-know-how to craft such a wonder, I do possess the magic of
+	imagination in which I have confirmed through (thought) experimentation that it definitely
+	works.
+</p>
+
+<p>
+	The basic machine is probably a set of camshafts that are somehow selectively enabled and
+	disabled. For each rotation, the following happens:
+</p>
+<ol>
+	<li>
+		At the symbol read head, something pokes through the holes in the tape, activating really
+		cool gadgetry that activate and deactivate various parts of the machine
+	</li>
+	<li>
+		The camshafts do their thing in their new configuration, performing the symbol's instruction
+	</li>
+	<li>The program tape is moved to the next symbol</li>
+</ol>
+
+<p>
+	I imagine the memory as a wheel with maybe switchable levers on it? Whatever's convenient to
+	read and write mechanically, really. The wheel idea seems simple and allows the memory to
+	naturally wrap around. Since the memory is left in an arbitrary state after program execution
+	and resetting it manually would be a hassle, programs must initialize their own memory.
+</p>
+
+<p>
+	The program tape is standard 1-inch 8-data-hole paper tape commonly used by teleprinters. Tapes
+	are punched out one column per instruction and are encoded in a fashion where each instruction
+	gets its own bit. Since this encoding leaves plenty of invalid possibilities, incorrectly
+	punched tapes might cause the machine to physically crash into itself. The tape is read left to
+	right with the 3-bit side on top. Folding is probably the easiest way to manage long tapes.
+</p>
+
+<p>
+	Jumping is a special state the machine can be in. Instead of executing symbols, it's looking
+	for the matching opposite symbol to the one that started the jump. There would be a gear that
+	counts the nesting depth for jump symbols. This means that there's a physical limit to how far
+	nested jump symbols can be. If the nesting limit is exceeded, I think the machine would
+	erroneously end the jump before the matching symbol is found. Realistically though, I think
+	it'd be trivial to make the counting gear large enough to accommodate any reasonable program.
+	Or, a digital mechanical counter could be used instead.
+</p>
+
+<p>
+	The machine is powered either through water or weights, because that would be neat. Electric
+	motors went out of style after the apocalypse. A pump for the water might be permissible so long
+	as it doesn't drown out the sounds of clacky mechanisms (important for debugging). Don't let the
+	water get near the program tape.
+</p>
+
+<h2>Text Syntax</h2>
+
+<p>For now we're stuck with software simulation, so here's a syntax for a text representation of program tapes.</p>
+
+<ul>
+	<li>Text is encoded as UTF-8</li>
+	<li>Symbols as described in Semantics are read left to right, top to bottom</li>
+	<li>Whitespace is ignored</li>
+	<li>
+		Content between <code>{*</code> and <code>*}</code> indicates a no-op as well
+		as physically printing the contained HTML onto the program tape (whitespace is trimmed).
+		Following <code>*</code> no-ops will extend the content area.
+	</li>
+	<li>
+		Content between <code>&lt;style&gt;</code> and <code>&lt;/style&gt;</code> indicates a style
+		sheet to add to the head of the program tape's HTML document.
+	</li>
+	<li><code>#</code> indicates a comment. It's ignored along with the rest of the line</li>
+</ul>
+
+<h2>Simulator</h2>
+
+<style>
+	#post-viewport {
+		font-family: 'Courier New', Courier, monospace;
+		background-color: #FFFFFF;
+		color: #000000;
+		height: 1in;
+		width: 2in;
+		/* margin: 0 0 10px; */
+		border: 0;
+		display: inline-block;
+	}
+
+	#post-code {
+		font-family: 'Courier New', Courier, monospace;
+		resize: vertical;
+		height: 500px;
+	}
+
+	.post-selected {
+		text-decoration: underline;
+	}
+</style>
+<style id="post-style">
+	#mechatendo-body::-webkit-scrollbar {
+		display: none;
+	}
+
+	.symbol-cell,
+	.html-cell {
+		outline-style: dotted;
+		outline-color: #000000;
+		outline-width: 1px;
+	}
+
+	.symbol-container {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: 0.1in;
+		grid-template-rows: 1in;
+	}
+
+	.symbol-cell {
+		font-family: monospace;
+		font-size: 8pt;
+		width: 0.1in;
+		text-align: center;
+	}
+
+	#mechatendo-body {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>
+
+<div><iframe id="post-viewport" sandbox="allow-same-origin"></iframe></div>
+
+<p>
+	<code id="post-memory"></code>
+	<span id="post-operations"></span> ops
+	<span id="post-state"></span>
+</p>
+<p>
+	<button id="post-load">Load</button>
+	<button id="post-0">0</button>
+	<button id="post-1">1</button>
+	<button id="post-step">Step</button>
+	<select id="post-speed">
+		<option value="pause">Pause</option>
+		<option value="1">1 op/sec</option>
+		<option value="2">2 ops/sec</option>
+		<option value="4" selected>4 ops/sec</option>
+		<option value="8">8 ops/sec</option>
+		<option value="16">16 ops/sec</option>
+		<option value="100">100 ops/sec</option>
+		<option value="1000">1,000 ops/sec</option>
+		<option value="10000">10,000 ops/sec</option>
+	</select>
+</p>
+
+<textarea id="post-code" placeholder="# Enter code here"></textarea>
+
+<h2>Examples</h2>
+<code>
+	## Hello World! ##<br><br>
+	1 # Write a 1 to memory so we enter the following loop<br>
+	[ # Beginning of infinite loop<br>
+	. # Halt, showing the output<br>
+	1 # Overwrite user input with a 1 so the loop continues<br>
+	] # End of loop<br>
+	***************** # Padding<br>
+	{* Hello world! *} # Output<br>
+	***** # Extend output content area<br>
+</code>
+<code>
+## 6-bit Calculator ##
+# An infuriatingly impractical number cruncher
+
+<style>
+.html-cell {
+  padding: 0.05in;
+}
+</style>
+
+0>0>0>0>0>0>0>0>0>0>0>0>>>>. # Initialize registers
+[>0>0>0>0>0>0<<<<<< # Set A to 0
+
+{*
+<strong>6-bit Calculator</strong><br><br>
+0. Next<br>
+1. Set A to 0
+*}*********
+
+0]. # Set A to 0 (continued)
+
+[<<<<<<<<<********* # Enter B
+
+{*
+0. Next<br>
+1. Enter B
+*}********
+
+.>******************
+{*
+0. B is from 0-31<br>
+1. B is from 32-63
+*}*************
+
+.>******************
+{*
+0. B is from 0-15 or 32-47<br>
+1. B is from 16-31 or 48-63
+*}*************
+
+.>******************
+{*
+0. B is from 0-7, 24-31, or 32-47<br>
+1. B is from 8-15, 16-23, or 48-63
+*}*************
+
+0]. # End enter B
+</code>
+
+<script defer>
+	// Configuration
+
+	const memoryCapacity = 16;
+	const viewportOffset = 20;
+	const viewportLength = 20;
+	const maxJumpNestDepth = 16;
+	const cellWidth = 0.1;
+
+	// Symbols
+	const symbols = "*.><01[]";
+	const symbolNoop = 0;
+	const symbolHalt = 1;
+	const symbolRotateRight = 2;
+	const symbolRotateLeft = 3;
+	const symbolWrite0 = 4;
+	const symbolWrite1 = 5;
+	const symbolJumpForward = 6;
+	const symbolJumpBackward = 7;
+	/** @type {Map<string,number>} */
+	const symbolToCode = new Map();
+	[...symbols].forEach((symbol, code) => {
+		symbolToCode.set(symbol, code);
+	});
+
+	// HTML Elements
+
+	/** @type {HTMLButtonElement} */
+	const loadButton = document.getElementById("post-load");
+	/** @type {HTMLButtonElement} */
+	const zeroButton = document.getElementById("post-0");
+	/** @type {HTMLButtonElement} */
+	const oneButton = document.getElementById("post-1");
+	/** @type {HTMLTextAreaElement} */
+	const codeText = document.getElementById("post-code");
+	/** @type {HTMLIFrameElement} */
+	const viewport = document.getElementById("post-viewport");
+	/** @type {HTMLSelectElement} */
+	const speed = document.getElementById("post-speed");
+	const memoryUi = document.getElementById("post-memory");
+	const opCounter = document.getElementById("post-operations");
+	const state = document.getElementById("post-state");
+	/** @type {HTMLButtonElement} */
+	const stepButton = document.getElementById("post-step");
+
+	// State
+
+	const memory = new Uint8Array(memoryCapacity);
+	memory.fill(2);
+	/** @type {HTMLSpanElement[]} */
+	const memoryUiBits = [];
+	for (let i = 0; i < memoryCapacity; i++) {
+		memoryUiBits.push(memoryUi.appendChild(document.createElement("span")));
+	}
+	let memoryIndex = 0;
+	let programIndex = 0;
+	let program = new Uint8Array();
+	/** @type {number[]} */
+	const sourceMap = [];
+	let isHalted = false;
+	let jumpDepth = 0;
+	let intervalId = -1;
+	let opCount = 0;
+	let isReset = false;
+
+	const bitCharacters = ["0", "1", "?"];
+
+	function updateUi() {
+		memoryUiBits.forEach((bit, index) => {
+			const data = bitCharacters[memory[index]];
+			bit.textContent = data;
+			bit.className = index === memoryIndex ? "post-selected" : "";
+		});
+		opCounter.textContent = opCount;
+		if (jumpDepth === 0) {
+			if (isHalted) {
+				state.textContent = "(waiting)";
+			} else {
+				if (isReset) {
+					state.textContent = "(unloaded)";
+				} else {
+					state.textContent = "(executing)";
+				}
+			}
+		} else {
+			state.textContent = "(jumping)";
+		}
+		if (!isReset) {
+			const position = sourceMap[programIndex];
+			codeText.setSelectionRange(position, position + 1, "forward");
+		}
+	}
+
+	/**
+	 * @param {string} message
+	 */
+	function error(message) {
+		isReset = false;
+		clearInterval(intervalId);
+		const viewDoc = viewport.contentDocument;
+		viewDoc.head.textContent = null;
+		viewDoc.body.textContent = "Error: " + message;
+		viewDoc.body.style.backgroundColor = "#FFCCCC";
+		zeroButton.disabled = true;
+		oneButton.disabled = true;
+		stepButton.disabled = true;
+		updateUi();
+	}
+
+	function startExecutionLoop() {
+		if (isHalted || isReset) { return; }
+		zeroButton.disabled = true;
+		oneButton.disabled = true;
+		stepButton.disabled = false;
+		codeText.focus();
+		clearInterval(intervalId);
+		let opsPerUpdate = 0;
+		let interval = 0;
+		switch (speed.value) {
+			case "1":
+				opsPerUpdate = 1;
+				interval = 1000;
+				break;
+			case "2":
+				opsPerUpdate = 1;
+				interval = 1000 / 2;
+				break;
+			case "4":
+				opsPerUpdate = 1;
+				interval = 1000 / 4;
+				break;
+			case "8":
+				opsPerUpdate = 1;
+				interval = 1000 / 8;
+				break;
+			case "16":
+				opsPerUpdate = 1;
+				interval = 1000 / 16;
+				break;
+			case "100":
+				opsPerUpdate = 25;
+				interval = 250;
+				break;
+			case "1000":
+				opsPerUpdate = 250;
+				interval = 250;
+				break;
+			case "10000":
+				opsPerUpdate = 2500;
+				interval = 250;
+				break;
+			default: // Paused
+				return;
+		}
+		intervalId = setInterval(() => execute(opsPerUpdate), interval);
+		execute(opsPerUpdate);
+	}
+
+	/**
+	 * Executes the given number of operations from the program tape.
+	 * @param {number} count
+	 */
+	function execute(count) {
+		try {
+			if (isHalted) { throw new Error("Executed while halting"); }
+			isReset = false;
+			const limit = opCount + count;
+			loop: for (; opCount < limit; opCount++) {
+				// Check program underflow
+				if (programIndex < 0) {
+					throw new Error("Program read head went past beginning of tape");
+				}
+
+				// Check program overflow
+				if (programIndex >= program.length) {
+					throw new Error("Program read head went past end of tape");
+				}
+				if (jumpDepth === 0) {
+					// Execute symbol
+					switch (program[programIndex]) {
+						case symbolNoop:
+							break;
+						case symbolHalt:
+							clearInterval(intervalId);
+							isHalted = true;
+							zeroButton.disabled = false;
+							oneButton.disabled = false;
+							stepButton.disabled = true;
+							programIndex++;
+							opCount++;
+							break loop;
+						case symbolRotateRight:
+							memoryIndex++;
+							if (memoryIndex >= memoryCapacity) {
+								memoryIndex = 0;
+							}
+							break;
+						case symbolRotateLeft:
+							memoryIndex--;
+							if (memoryIndex < 0) {
+								memoryIndex = memoryCapacity - 1;
+							}
+							break;
+						case symbolWrite0:
+							memory[memoryIndex] = 0;
+							break;
+						case symbolWrite1:
+							memory[memoryIndex] = 1;
+							break;
+						case symbolJumpForward:
+							{
+								const bit = memory[memoryIndex];
+								if (bit === 0) {
+									jumpDepth = 1;
+								} else {
+									if (bit !== 1) {
+										throw new Error("Read uninitialized memory on [");
+									}
+								}
+							}
+							break;
+						case symbolJumpBackward:
+							{
+								const bit = memory[memoryIndex];
+								if (bit === 1) {
+									jumpDepth = -1;
+									programIndex--;
+									continue;
+								} else {
+									if (bit !== 0) {
+										throw new Error("Read uninitialized memory on ]");
+									}
+								}
+							}
+							break;
+						default:
+							throw new Error("Executed invalid symbol " + program[programIndex]);
+					}
+					programIndex++;
+				} else {
+					switch (program[programIndex]) {
+						case symbolJumpForward: jumpDepth++; break;
+						case symbolJumpBackward: jumpDepth--; break;
+					}
+					if (jumpDepth < 0) {
+						if (jumpDepth < -maxJumpNestDepth) {
+							throw new Error("Exceeded maximum nest depth while jumping backward");
+						}
+						programIndex--;
+					} else {
+						if (jumpDepth > maxJumpNestDepth) {
+							throw new Error("Exceeded maximum nest depth while jumping forward");
+						}
+						programIndex++;
+					}
+				}
+			}
+			const viewWindow = viewport.contentWindow;
+			viewWindow.scrollTo(
+				(programIndex - 1 + viewportOffset) * viewWindow.document.body.scrollWidth /
+				(program.length + viewportLength),
+				0
+			);
+			updateUi();
+		} catch (e) {
+			error(e instanceof Error ? e.message : String(e));
+		}
+	}
+
+	function reset() {
+		if (!isReset) {
+			isReset = true;
+			memory.fill(2);
+			memoryIndex = 0;
+			opCount = 0;
+			jumpDepth = 0;
+			isHalted = false;
+			const viewDoc = viewport.contentDocument;
+			viewDoc.head.textContent = null;
+			viewDoc.body.style.cssText = "";
+			viewDoc.body.textContent = "This is the program tape viewport. Load some code to begin";
+			zeroButton.disabled = true;
+			oneButton.disabled = true;
+			stepButton.disabled = true;
+			updateUi();
+		}
+	}
+	reset();
+
+	loadButton.addEventListener("click", () => {
+		isReset = false;
+		memory.fill(2);
+		memoryIndex = 0;
+		programIndex = 0;
+		jumpDepth = 0;
+		isHalted = false;
+		opCount = 0;
+
+		sourceMap.length = 0;
+		const stylesheets = [];
+		const programSymbols = [];
+		/** @type {Map<number,string>} */
+		const htmlCells = new Map();
+
+		// Parse tokens
+		const tokens = codeText.value.matchAll(
+			/<style>(.*?)<\/style>|{\*\s*(.*?)\s*\*}|(#.*?$)|([^\s])/gsmi
+		);
+		for (const token of tokens) {
+			// Stylesheet token
+			const stylesheet = token[1];
+			if (stylesheet !== undefined) {
+				stylesheets.push(stylesheet);
+				continue;
+			}
+			// HTML token
+			const html = token[2];
+			if (html !== undefined) {
+				programSymbols.push(0);
+				sourceMap.push(token.index);
+				htmlCells.set(programSymbols.length - 1, html);
+				continue;
+			}
+			// Symbol token
+			const symbol = token[4];
+			if (symbol !== undefined) {
+				const symbolCode = symbolToCode.get(symbol);
+				if (symbolCode === undefined) {
+					error(symbol + " is not a valid symbol");
+					return;
+				}
+				programSymbols.push(symbolCode);
+				sourceMap.push(token.index);
+			}
+		}
+		program = new Uint8Array(programSymbols);
+		const viewDoc = viewport.contentDocument;
+		viewDoc.head.textContent = null;
+		viewDoc.body.textContent = null;
+		viewDoc.body.style.cssText = "";
+		viewDoc.body.id = "mechatendo-body";
+		const mainStyle = viewDoc.importNode(document.getElementById("post-style"), true);
+		mainStyle.id = "";
+		viewDoc.head.append(mainStyle);
+
+		const symbolContainer = viewDoc.body.appendChild(viewDoc.createElement("div"));
+		symbolContainer.className = "symbol-container";
+
+		// Add stylesheets
+		for (const stylesheet of stylesheets) {
+			const style = viewDoc.createElement("style");
+			style.textContent = stylesheet;
+			viewDoc.head.append(style);
+		}
+
+		// Add symbol and html cells
+
+		function applyHtmlCell() {
+			if (currentHtmlCell !== null) {
+				const htmlCell = symbolContainer.appendChild(viewDoc.createElement("div"));
+				htmlCell.className = "html-cell";
+				htmlCell.innerHTML = currentHtmlCell;
+				htmlCell.style.gridColumnEnd = "span " + htmlCellWidth;
+				currentHtmlCell = null;
+			}
+		}
+		/** @type {string?} */
+		let currentHtmlCell = null;
+		let htmlCellWidth = 0;
+		for (let i = 0; i < program.length; i++) {
+			const symbol = program[i];
+			if (symbol === symbolNoop) {
+				if (currentHtmlCell !== null) {
+					htmlCellWidth++;
+					continue;
+				} else {
+					const tryHtmlCell = htmlCells.get(i);
+					if (tryHtmlCell) {
+						currentHtmlCell = tryHtmlCell;
+						htmlCellWidth = 1;
+						continue;
+					}
+				}
+			} else {
+				applyHtmlCell();
+			}
+			const symbolCell = viewDoc.createElement("div");
+			symbolCell.className = "symbol-cell";
+			symbolCell.textContent = symbols.charAt(symbol);
+			symbolContainer.append(symbolCell);
+		}
+		applyHtmlCell();
+
+		// Add trailing cell (for scrolling)
+		const trailingCell = viewDoc.createElement("div");
+		trailingCell.className = "html-cell";
+		trailingCell.style.gridColumnEnd = "span " + viewportLength;
+		symbolContainer.append(trailingCell);
+
+		updateUi();
+		startExecutionLoop();
+	});
+
+	zeroButton.addEventListener("click", () => {
+		memory[memoryIndex] = 0;
+		isHalted = false;
+		startExecutionLoop();
+	});
+
+	oneButton.addEventListener("click", () => {
+		memory[memoryIndex] = 1;
+		isHalted = false;
+		startExecutionLoop();
+	});
+
+	stepButton.addEventListener("click", () => {
+		codeText.focus();
+		execute(1)
+	});
+
+	codeText.addEventListener("input", reset);
+
+	speed.addEventListener("change", startExecutionLoop);
+</script>

@@ -87,7 +87,7 @@ nav a:visited {
 	color: #c5beb7;
 }
 
-.main>*,
+.main>:not(script, style),
 body>p,
 body>video {
 	width: 700px;
@@ -95,6 +95,11 @@ body>video {
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
+	box-sizing: border-box;
+}
+
+.main>code {
+	margin: 16px auto;
 }
 
 .audio {
@@ -129,10 +134,24 @@ video {
 	height: auto;
 }
 
+code {
+	color: #fffbd8;
+	background-color: #202020;
+	border-color: #202020;
+	border-radius: 3px;
+	border-width: 3px;
+	padding: 0 3px;
+}
+
 .icon {
 	width: 1.4em;
 	max-width: 100%;
 	height: auto;
 	display: inline;
 	vertical-align: -27%;
+}
+
+textarea {
+	background-color: #000000;
+	color: #f8ebde;
 }
